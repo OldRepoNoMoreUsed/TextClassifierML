@@ -29,11 +29,18 @@ def create_dir():
     print("TestText directories create")
 
 
+def fill_dir(dir_path, training_files):
+    for f in training_files:
+        t = "tagged/neg/" + str(f)
+        print(t)
+        shutil.copy2(t, "TrainingText/neg/")
+
 if __name__ == "__main__":
     create_dir()
     print("Select file for training")
     negative_files = select_random_training_file("tagged/neg/")
     print("Selected negative files: " + str(negative_files))
+    fill_dir("truc", negative_files)
     positive_files = select_random_training_file("tagged/pos/")
     print("\nSelected positive files: " + str(positive_files))
 
