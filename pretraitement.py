@@ -8,41 +8,39 @@ import os
 import random
 import shutil
 
-def select_random_training_file(dir_path):
-    """Choisi les fichiers qui feront parti du corpus d'entrainement"""
-    training_files = []
-    while len(training_files) < 400:
-        choose_file = random.choice(os.listdir(dir_path))
-        if choose_file not in training_files:
-            training_files.append(choose_file)
-    return training_files
+CATEGORIES = ["pos", "neg"]
 
-def create_dir():
-    """Crée l'arborescence de dossier utile"""
-    shutil.rmtree("TestText")
-    shutil.rmtree("TrainingText")
-    os.makedirs("TrainingText/neg")
-    os.makedirs("TrainingText/pos")
-    os.makedirs("TestText/neg")
-    os.makedirs("TestText/pos")
-    print("TrainingText directories create")
-    print("TestText directories create")
+SOURCES = ["tagged/pos", "tagged/neg"]
+TARGET = ["training/pos", "training/neg", "test/pos", "test/neg"]
 
+TAG = ["NOM", "ADJ", "VER", "ADV"]
 
-def fill_dir(dir_path, training_files):
-    for f in training_files:
-        t = "tagged/neg/" + str(f)
-        print(t)
-        shutil.copy2(t, "TrainingText/neg/")
+RATIO = 0.8
+POS_NEG_RATIO = 0.5
 
-if __name__ == "__main__":
-    create_dir()
-    print("Select file for training")
-    negative_files = select_random_training_file("tagged/neg/")
-    print("Selected negative files: " + str(negative_files))
-    fill_dir("truc", negative_files)
-    positive_files = select_random_training_file("tagged/pos/")
-    print("\nSelected positive files: " + str(positive_files))
+def review(files, source, target):
+    """Decoupe et tri les fichiers données"""
+    for file in files:
+        with open(str(source) + "/" + str(file), 'r') as opened_file:
+            resume = ""
+            for line in opened_file:
+                if any(word in line for word in TAG):
+                    splited_line = line.split("\t")[2]
+                    if "|" in splited_line:
+                        resume += splited_line.split("|")[0]
+                    else:
+                        resume += splited_line
+        with open(str(target) + "/reviewed_" + str(opened_file), 'w') as out:
+            out.write(resume)
+
+if __name__ == '__main__':
+    print("Read directories...")
+    POSITIVE_FILES = os.listdir(SOURCES[0])
+    NEGATIVE_FILES = os.listdir(SOURCES[1])
+    print("Counting files...")
+    COUNT_POS = len(POSITIVE_FILES)
+    COUNT_NEG = len(NEGATIVE_FILES)
+
 
 
 
